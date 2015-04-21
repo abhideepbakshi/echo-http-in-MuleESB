@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="Echo-Http">
+    <global-element name="Java" type="http://www.mulesoft.org/schema/mule/core/custom-transformer" entity-id="Java#1">
+        <properties>
+            <property name="returnClass"/>
+            <property name="ignoreBadInput"/>
+            <property name="name" value="StdinToNameString"/>
+            <property name="encoding"/>
+            <property name="class" value="org.mule.example.hello.StdinToNameString"/>
+            <property name="mimeType"/>
+            <property name="auxiliary;index" value="1"/>
+        </properties>
+    </global-element>
+    <global-element name="Java" type="http://www.mulesoft.org/schema/mule/core/custom-transformer" entity-id="Java#2">
+        <properties>
+            <property name="returnClass"/>
+            <property name="ignoreBadInput"/>
+            <property name="name" value="NameStringToChatString"/>
+            <property name="encoding"/>
+            <property name="class" value="org.mule.example.hello.NameStringToChatString"/>
+            <property name="mimeType"/>
+            <property name="auxiliary;index" value="2"/>
+        </properties>
+    </global-element>
+    <global-element name="Java" type="http://www.mulesoft.org/schema/mule/core/custom-transformer" entity-id="Java#3">
+        <properties>
+            <property name="returnClass"/>
+            <property name="ignoreBadInput"/>
+            <property name="name" value="ChatStringToString"/>
+            <property name="encoding"/>
+            <property name="class" value="org.mule.example.hello.ChatStringToString"/>
+            <property name="mimeType"/>
+            <property name="auxiliary;index" value="3"/>
+        </properties>
+    </global-element>
+    <global-element name="Java" type="http://www.mulesoft.org/schema/mule/core/custom-transformer" entity-id="Java#4">
+        <properties>
+            <property name="returnClass"/>
+            <property name="ignoreBadInput"/>
+            <property name="name" value="HttpRequestToNameString"/>
+            <property name="encoding"/>
+            <property name="class" value="org.mule.example.hello.HttpRequestToNameString"/>
+            <property name="mimeType"/>
+            <property name="auxiliary;index" value="4"/>
+        </properties>
+    </global-element>
+    <global-element name="Java" type="http://www.mulesoft.org/schema/mule/core/custom-transformer" entity-id="Java#5">
+        <properties>
+            <property name="returnClass"/>
+            <property name="ignoreBadInput"/>
+            <property name="name" value="HttpRequestToNameString2"/>
+            <property name="encoding"/>
+            <property name="class" value="org.mule.example.hello.HttpRequestToNameString2"/>
+            <property name="mimeType"/>
+            <property name="auxiliary;index" value="5"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Request-Response_Message_Pattern" index="6" entity-id="global-unknown#1">
+        <content>&lt;model xmlns=&quot;http://www.mulesoft.org/schema/mule/core&quot; name=&quot;Request-Response_Message_Pattern&quot;&gt;
+		&lt;service name=&quot;SynchronousService&quot;&gt;
+			&lt;inbound&gt;
+				&lt;http:inbound-endpoint xmlns:http=&quot;http://www.mulesoft.org/schema/mule/http&quot; host=&quot;localhost&quot; port=&quot;8081&quot; path=&quot;service&quot; exchange-pattern=&quot;request-response&quot; transformer-refs=&quot;HttpRequestToNameString&quot;/&gt;
+			&lt;/inbound&gt;
+			&lt;component class=&quot;org.mule.example.hello.Greeter&quot;/&gt;
+			&lt;outbound&gt;
+				&lt;filtering-router&gt;
+					&lt;vm:outbound-endpoint xmlns:vm=&quot;http://www.mulesoft.org/schema/mule/vm&quot; path=&quot;chitchatter&quot;/&gt;
+					&lt;payload-type-filter name=&quot;NameString&quot; expectedType=&quot;org.mule.example.hello.NameString&quot;/&gt;
+				&lt;/filtering-router&gt;
+			&lt;/outbound&gt;
+		&lt;/service&gt;
+		
+		&lt;service name=&quot;SynchronousService2&quot;&gt;
+			&lt;inbound&gt;
+				&lt;http:inbound-endpoint xmlns:http=&quot;http://www.mulesoft.org/schema/mule/http&quot; host=&quot;localhost&quot; port=&quot;8081&quot; path=&quot;service2&quot; exchange-pattern=&quot;request-response&quot; transformer-refs=&quot;HttpRequestToNameString2&quot;/&gt;
+			&lt;/inbound&gt;
+			&lt;component class=&quot;org.mule.example.hello.Greeter&quot;/&gt;
+			&lt;outbound&gt;
+				&lt;filtering-router&gt;
+					&lt;vm:outbound-endpoint xmlns:vm=&quot;http://www.mulesoft.org/schema/mule/vm&quot; path=&quot;chitchatter&quot;/&gt;
+					&lt;payload-type-filter name=&quot;NameString2&quot; expectedType=&quot;org.mule.example.hello.NameString&quot;/&gt;
+				&lt;/filtering-router&gt;
+			&lt;/outbound&gt;
+		&lt;/service&gt;
+		
+		&lt;service name=&quot;SynchronousService3&quot;&gt;
+			&lt;inbound&gt;
+				&lt;http:inbound-endpoint xmlns:http=&quot;http://www.mulesoft.org/schema/mule/http&quot; host=&quot;localhost&quot; port=&quot;8081&quot; path=&quot;service3&quot; exchange-pattern=&quot;request-response&quot; transformer-refs=&quot;HttpRequestToNameString2&quot;/&gt;
+			&lt;/inbound&gt;
+			&lt;component class=&quot;org.mule.example.hello.StringGreeter&quot;/&gt;
+		&lt;/service&gt;
+		
+
+		&lt;service name=&quot;ChitChatUMO&quot;&gt;
+			&lt;inbound&gt;
+				&lt;vm:inbound-endpoint xmlns:vm=&quot;http://www.mulesoft.org/schema/mule/vm&quot; path=&quot;chitchatter&quot; transformer-refs=&quot;NameStringToChatString&quot;/&gt;
+			&lt;/inbound&gt;
+			&lt;component class=&quot;org.mule.example.hello.ChitChatter&quot;/&gt;
+			&lt;outbound&gt;
+				&lt;pass-through-router&gt;
+					&lt;stdio:outbound-endpoint xmlns:stdio=&quot;http://www.mulesoft.org/schema/mule/stdio&quot; system=&quot;OUT&quot; transformer-refs=&quot;ChatStringToString&quot;/&gt;
+				&lt;/pass-through-router&gt;
+			&lt;/outbound&gt;
+		&lt;/service&gt;
+	&lt;/model&gt;</content>
+    </global-unknown>
+    <flow SubFlow="false" name="Appender" entity-id="67f7dca1-65e9-42c7-8c35-7cc0438342b0">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="initialState"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="34"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <pattern name="Append String" type="http://www.mulesoft.org/schema/mule/core/append-string-transformer" entity-id="Append String#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value="this will fuck me"/>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="35"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="false" name="Http-FLow" entity-id="8c71b520-9e01-420d-9e21-6d6d49e90324">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="initialState"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="36"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <endpoint direction="Inbound" message-exchange-pattern="RequestResponse" name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="port" value="8081"/>
+                    <property name="host" value="localhost"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="followRedirects"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+                    <property name="keep-alive"/>
+                    <property name="contentType"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="password"/>
+                    <property name="exchange-pattern" value="request-response"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="httpLabel"/>
+                    <property name="address"/>
+                    <property name="path" value="echo-user"/>
+                    <property name="encoding"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="method"/>
+                    <property name="user"/>
+                    <property name="responseTimeout"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="37"/>
+                    <property name="connector-ref"/>
+                </properties>
+            </endpoint>
+            <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value="#[groovy:return message.toString();]"/>
+                    <property name="category"/>
+                    <property name="level" value="INFO"/>
+                    <property name="auxiliary;index" value="38"/>
+                </properties>
+            </pattern>
+            <pattern name="Flow Reference" type="http://www.mulesoft.org/schema/mule/core/flow-ref" entity-id="Flow Reference#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="name" value="Appender"/>
+                    <property name="auxiliary;index" value="39"/>
+                </properties>
+            </pattern>
+            <pattern name="Append String" type="http://www.mulesoft.org/schema/mule/core/append-string-transformer" entity-id="Append String#2">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value=". Let fuck the mule"/>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="40"/>
+                </properties>
+            </pattern>
+            <endpoint direction="Outbound" message-exchange-pattern="OneWay" name="Generic" type="http://www.mulesoft.org/schema/mule/core/endpoint" entity-id="Generic#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="address" value="http://localhost:8081/echo-user/pattern"/>
+                    <property name="encoding"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="mimeType"/>
+                    <property name="responseTimeout"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="auxiliary;index" value="41"/>
+                    <property name="exchange-pattern"/>
+                    <property name="connector-ref"/>
+                </properties>
+            </endpoint>
+        </lane>
+    </flow>
+    <flow SubFlow="false" name="http-response" entity-id="f283cab3-91fa-4e65-8169-8058ee22814c">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="initialState"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="42"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#3">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <endpoint direction="Inbound" message-exchange-pattern="RequestResponse" name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#2">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="port" value="8081"/>
+                    <property name="host" value="localhost"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="followRedirects"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+                    <property name="keep-alive"/>
+                    <property name="contentType"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="password"/>
+                    <property name="exchange-pattern" value="request-response"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="httpLabel"/>
+                    <property name="address"/>
+                    <property name="path" value="echo-user/pattern"/>
+                    <property name="encoding"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="method"/>
+                    <property name="user"/>
+                    <property name="responseTimeout"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="43"/>
+                    <property name="connector-ref"/>
+                </properties>
+            </endpoint>
+            <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value="#[groovy:return message.toString();]"/>
+                    <property name="category"/>
+                    <property name="level" value="INFO"/>
+                    <property name="auxiliary;index" value="44"/>
+                </properties>
+            </pattern>
+            <pattern name="Append String" type="http://www.mulesoft.org/schema/mule/core/append-string-transformer" entity-id="Append String#3">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="message" value=". Its work"/>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="45"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <description></description>
+</mule-configuration>

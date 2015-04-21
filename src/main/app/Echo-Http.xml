@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" 
+	xmlns:smtps="http://www.mulesoft.org/schema/mule/smtps"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+	xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.4.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/smtps http://www.mulesoft.org/schema/mule/smtps/current/mule-smtps.xsd http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/current/mule-stdio.xsd
+http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+
+	
+<!-- Create a transformer -->
+	<custom-transformer name="StdinToNameString" class="org.mule.example.hello.StdinToNameString" />
+	<custom-transformer name="NameStringToChatString" class="org.mule.example.hello.NameStringToChatString" />
+	<custom-transformer name="ChatStringToString" class="org.mule.example.hello.ChatStringToString" />
+	<custom-transformer name="HttpRequestToNameString" class="org.mule.example.hello.HttpRequestToNameString" />
+	<custom-transformer name="HttpRequestToNameString2" class="org.mule.example.hello.HttpRequestToNameString2" />
+	
+
+
+<!--  Creating the service component -->
+	<model name="Request-Response_Message_Pattern">
+		<service name="SynchronousService">
+			<inbound>
+				<http:inbound-endpoint host="localhost" port="8081"
+					path="service" exchange-pattern="request-response" transformer-refs="HttpRequestToNameString"  />
+			</inbound>
+			<component class="org.mule.example.hello.Greeter" />
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="chitchatter" />
+					<payload-type-filter name="NameString"
+						expectedType="org.mule.example.hello.NameString" />
+				</filtering-router>
+			</outbound>
+		</service>
+		
+		<service name="SynchronousService2">
+			<inbound>
+				<http:inbound-endpoint host="localhost" port="8081"
+					path="service2" exchange-pattern="request-response" transformer-refs="HttpRequestToNameString2"  />
+			</inbound>
+			<component class="org.mule.example.hello.Greeter" />
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="chitchatter" />
+					<payload-type-filter name="NameString2"
+						expectedType="org.mule.example.hello.NameString" />
+				</filtering-router>
+			</outbound>
+		</service>
+		
+		<service name="SynchronousService3">
+			<inbound>
+				<http:inbound-endpoint host="localhost" port="8081"
+					path="service3" exchange-pattern="request-response" transformer-refs="HttpRequestToNameString2"  />
+			</inbound>
+			<component class="org.mule.example.hello.StringGreeter" />
+		</service>
+		
+
+		<service name="ChitChatUMO">
+			<inbound>
+				<vm:inbound-endpoint path="chitchatter"
+					transformer-refs="NameStringToChatString" />
+			</inbound>
+			<component class="org.mule.example.hello.ChitChatter" />
+			<outbound>
+				<pass-through-router>
+					<stdio:outbound-endpoint system="OUT"
+						transformer-refs="ChatStringToString" />
+				</pass-through-router>
+			</outbound>
+		</service>
+	</model>
+	
+<!--  Create a global flow -->	
+	<flow name="Appender" doc:name="Appender">
+		<append-string-transformer message="this will fuck me"
+			doc:name="Append String" />
+	</flow>
+	
+<!-- Creating the flow -->	
+	<flow name="Http-FLow" doc:name="Http-FLow">
+		<http:inbound-endpoint exchange-pattern="request-response"
+			host="localhost" port="8081" path="echo-user" doc:name="HTTP" />
+		<logger level="INFO" message="#[groovy:return message.toString();]"
+			doc:name="Logger" />
+		<flow-ref name="Appender" doc:name="Flow Reference" />
+		<append-string-transformer message=". Let fuck the mule"
+			doc:name="Append String" />
+		<outbound-endpoint address="http://localhost:8081/echo-user/pattern"
+			doc:name="Generic" />
+	</flow>
+	<flow name="http-response" doc:name="http-response">
+		<http:inbound-endpoint exchange-pattern="request-response"
+			host="localhost" port="8081" path="echo-user/pattern" doc:name="HTTP" />
+		<logger level="INFO" message="#[groovy:return message.toString();]"
+			doc:name="Logger" />
+		<append-string-transformer message=". Its work"
+			doc:name="Append String" />
+	</flow>
+
+
+</mule>
